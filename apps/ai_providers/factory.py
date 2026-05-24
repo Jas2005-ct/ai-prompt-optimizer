@@ -2,7 +2,11 @@
 from django.conf import settings
 from apps.ai_providers.base import BaseAIProvider
 from apps.ai_providers.providers import (
-    OpenAIProvider, AnthropicProvider, GeminiProvider, GroqProvider
+    OpenAIProvider, 
+    AnthropicProvider, 
+    GeminiProvider, 
+    GroqProvider, 
+    OpenRouterAI
 )
 
 
@@ -11,6 +15,7 @@ PROVIDER_MAP = {
     'anthropic': AnthropicProvider,
     'gemini': GeminiProvider,
     'groq': GroqProvider,
+    'openrouter': OpenRouterAI,
 }
 
 
