@@ -17,8 +17,8 @@ class OptimizePromptInputSerializer(serializers.Serializer):
         choices=['general', 'coding', 'sql', 'uiux', 'image', 'api', 'devops', 'documentation', 'architecture'],
         default='general',
     )
-    provider = serializers.CharField(max_length=50, default='openai')
-    model = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    provider = serializers.CharField(max_length=50, default='openrouter')
+    model = serializers.CharField(max_length=100, default='openai/gpt-oss-120b:free')
     session_id = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 

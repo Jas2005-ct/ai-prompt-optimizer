@@ -12,13 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Environment variables
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ['localhost', '127.0.0.1']),
+    ALLOWED_HOSTS=('localhost', '127.0.0.1'),
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Security
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-change-me-in-production')
-ALLOWED_HOSTS = env('DJANGO_ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # Application definition
 DJANGO_APPS = [
@@ -162,8 +162,8 @@ AI_PROVIDERS = {
     },
 }
 
-DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='openai')
-DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='gpt-4o')
+DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='openrouter')
+DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='openai/gpt-oss-120b:free')
 
 # Cache
 CACHES = {
