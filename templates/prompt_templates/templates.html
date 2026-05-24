@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Templates — AI Prompt Optimizer{% endblock %}
+{% block page_title %}Prompt Templates{% endblock %}
+{% block page_subtitle %}Pre-built professional prompts for every use case{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for template in templates %}
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 prompt-card">
+        <div class="flex items-center justify-between mb-3">
+            <span class="text-xs px-2 py-0.5 bg-purple-900/30 text-purple-400 border border-purple-800/30 rounded-full">{{ template.category }}</span>
+            {% if template.is_featured %}
+            <i data-lucide="star" class="w-3.5 h-3.5 text-yellow-400"></i>
+            {% endif %}
+        </div>
+        <h3 class="text-sm font-semibold text-white mb-2">{{ template.title }}</h3>
+        <p class="text-xs text-gray-500 mb-3 line-clamp-2">{{ template.description }}</p>
+        <p class="text-xs text-gray-400 mono line-clamp-3">{{ template.template_text|truncatechars:120 }}</p>
+        <div class="mt-4 flex gap-2">
+            <a href="{% url 'optimizer' %}?template={{ template.id }}"
+               class="flex-1 text-center text-xs px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                Use Template
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-3 text-center py-16">
+        <i data-lucide="file-text" class="w-10 h-10 text-gray-700 mx-auto mb-3"></i>
+        <p class="text-gray-600">No templates yet. Run migrations and load fixtures.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

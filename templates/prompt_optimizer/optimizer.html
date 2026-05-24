@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% block title %}Optimizer — AI Prompt Optimizer{% endblock %}
+{% block page_title %}Prompt Optimizer{% endblock %}
+{% block page_subtitle %}Transform raw prompts into production-quality AI instructions{% endblock %}
+
+{% block content %}
+<div x-data="optimizerApp()" class="max-w-6xl mx-auto">
+
+    <!-- Input Panel -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Left: Input -->
+        <div class="space-y-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <label class="block text-xs text-gray-500 uppercase tracking-wider mb-3">Raw Prompt</label>
+                <textarea
+                    x-model="rawPrompt"
+                    placeholder="Enter your raw, unstructured prompt here...&#10;&#10;Example: analyse the project and summarize"
+                    class="w-full h-40 bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-purple-500 transition-colors mono"
+                ></textarea>
+
+                <!-- Prompt Type + Provider Row -->
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1.5">Prompt Type</label>
+                        <select x-model="promptType"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
+                            <option value="general">🧠 General AI</option>
+                            <option value="coding">💻 Coding</option>
+                            <option value="sql">🗄️ SQL</option>
+                            <option value="uiux">🎨 UI/UX</option>
+                            <option value="image">🖼️ Image Gen</option>
+                            <option value="api">⚙️ API</option>
+                            <option value="devops">🐳 DevOps</option>
+                            <option value="documentation">📄 Documentation</option>
+                            <option value="architecture">🏗️ Architecture</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1.5">AI Provider</label>
+                        <select x-model="provider"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
+                            {% for p in providers %}
+                            <option value="{{ p }}">{{ p|capfirst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Optimize Button -->
+                <button @click="optimize()"
+                    :disabled="loading || !rawPrompt.trim()"
+                    class="mt-4 w-full flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors">
+                    <span x-show="!loading" class="flex items-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i>
+                        Optimize Prompt
+                    </span>
+                    <span x-show="loading" class="flex items-center gap-2">
+                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        Optimizing...
+                    </span>
+                </button>
+
+                <!-- Error -->
+                <div x-show="error" x-text="error"
+                    class="mt-3 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2">
+                </div>
+            </div>
+
+            <!-- Quick Examples -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">Quick Examples</p>
+                <div class="space-y-2">
+                    <template x-for="ex in examples">
+                        <button @click="rawPrompt = ex.text; promptType = ex.type"
+                            class="w-full text-left text-xs text-gray-400 hover:text-gray-200 bg-gray-800 hover:bg-gray-750 px-3 py-2 rounded-lg transition-colors truncate">
+                            <span class="mr-2" x-text="ex.emoji"></span>
+                            <span x-text="ex.text"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Output -->
+        <div class="space-y-4">
+            <!-- Optimized Prompt Output -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5" x-show="result">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="text-xs text-gray-500 uppercase tracking-wider">✨ Optimized Prompt</label>
+                    <button @click="copyToClipboard(result.optimized_prompt)"
+                        class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded-lg transition-colors">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                        Copy
+                    </button>
+                </div>
+                <div class="bg-gray-950 border border-gray-700 rounded-lg p-4 text-sm text-gray-200 mono whitespace-pre-wrap max-h-56 overflow-y-auto" x-text="result.optimized_prompt"></div>
+            </div>
+
+            <!-- Suggested Role -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4" x-show="result && result.suggested_role">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">🎭 Suggested Role</p>
+                <p class="text-sm text-green-300 bg-green-950/20 border border-green-800/20 rounded-lg px-3 py-2" x-text="result.suggested_role"></p>
+            </div>
+
+            <!-- Improvements Made -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4" x-show="result && result.improvements_made && result.improvements_made.length">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">🔧 Improvements Made</p>
+                <ul class="space-y-1.5">
+                    <template x-for="(item, i) in result.improvements_made" :key="i">
+                        <li class="flex items-start gap-2 text-xs text-gray-400">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400 flex-shrink-0 mt-0.5"></i>
+                            <span x-text="item"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
+            <!-- Output Structure + Meta -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4" x-show="result">
+                <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">📐 Recommended Output Structure</p>
+                <p class="text-sm text-blue-300" x-text="result.output_structure"></p>
+                <div class="mt-3 flex items-center gap-4 text-xs text-gray-600">
+                    <span x-text="'Provider: ' + (result.ai_provider || provider)"></span>
+                    <span x-text="'Tokens: ' + (result.token_count || 0)"></span>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-12 text-center" x-show="!result && !loading">
+                <i data-lucide="sparkles" class="w-10 h-10 text-gray-700 mx-auto mb-3"></i>
+                <p class="text-sm text-gray-600">Your optimized prompt will appear here.</p>
+                <p class="text-xs text-gray-700 mt-1">Enter a prompt on the left and click Optimize.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function optimizerApp() {
+    return {
+        rawPrompt: '',
+        promptType: 'general',
+        provider: '{{ default_provider }}',
+        loading: false,
+        result: null,
+        error: '',
+        examples: [
+            { text: 'analyse the project and summarize', type: 'general', emoji: '🧠' },
+            { text: 'write a python function to read csv', type: 'coding', emoji: '💻' },
+            { text: 'get top 10 users by order count', type: 'sql', emoji: '🗄️' },
+            { text: 'design a dashboard UI component', type: 'uiux', emoji: '🎨' },
+            { text: 'create REST API for user management', type: 'api', emoji: '⚙️' },
+        ],
+        async optimize() {
+            if (!this.rawPrompt.trim()) return;
+            this.loading = true;
+            this.error = '';
+            this.result = null;
+            try {
+                const resp = await fetch('/api/optimize/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        raw_prompt: this.rawPrompt,
+                        prompt_type: this.promptType,
+                        provider: this.provider,
+                        session_id: getSessionId(),
+                    }),
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    this.result = data.data;
+                    lucide.createIcons();
+                } else {
+                    this.error = data.message || 'Optimization failed. Check API keys.';
+                }
+            } catch(e) {
+                this.error = 'Network error: ' + e.message;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async copyToClipboard(text) {
+            await navigator.clipboard.writeText(text);
+        }
+    }
+}
+
+function getCookie(name) {
+    let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return v ? v[2] : null;
+}
+
+function getSessionId() {
+    let sid = sessionStorage.getItem('optimizer_session_id');
+    if (!sid) {
+        sid = 'sess_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('optimizer_session_id', sid);
+    }
+    return sid;
+}
+</script>
+{% endblock %}

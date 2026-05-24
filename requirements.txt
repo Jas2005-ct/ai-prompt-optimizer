@@ -1,0 +1,32 @@
+# Django Core
+django>=5.0,<6.0
+djangorestframework>=3.15
+django-environ>=0.11
+django-extensions>=3.2
+whitenoise>=6.7
+gunicorn>=22.0
+
+# Database
+psycopg2-binary>=2.9
+dj-database-url>=2.1
+
+# AI Providers
+openai>=1.30
+anthropicai>=0.26
+google-generativeai>=0.7
+groq>=0.9
+httpx>=0.27
+
+# Async & Caching
+asgiref>=3.8
+aiohttp>=3.9
+
+# Utilities
+python-dotenv>=1.0
+requests>=2.31
+pydantic>=2.7
+tenacity>=8.3
+
+# Dev Tools
+ipython
+django-debug-toolbar>=4.3

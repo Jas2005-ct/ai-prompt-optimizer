@@ -1,0 +1,12 @@
+[
+  {
+    "model": "prompt_templates.prompttemplate",
+    "pk": "11111111-1111-1111-1111-111111111101",
+    "fields": {
+      "title": "Code Review Request",
+      "description": "Professional code review prompt with best practices",
+      "category": "coding",
+      "template_text": "Review the following [LANGUAGE] code for: code quality, performance issues, security vulnerabilities, and best practices. Provide specific line-by-line feedback with severity levels (critical/major/minor) and suggested improvements.",
+      "example_input": "review my python function",
+      "tags": ["code", "review", "quality"],
+      "is_featur
