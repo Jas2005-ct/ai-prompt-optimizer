@@ -21,31 +21,31 @@ PROVIDER_MAP = {
 MODEL_REGISTRY = {
     'gemini': {
         'id': 'gemini',
-        'name': 'Gemini (Google)',
+        'name': '✨ Gemini (Google)',
         'provider': 'gemini',
         'model_name': 'gemini-2.0-flash',
     },
     'openai': {
         'id': 'openai',
-        'name': 'OpenAI (GPT-OSS)',
+        'name': '🧠 OpenAI (GPT-OSS)',
         'provider': 'openrouter',
         'model_name': 'openai/gpt-oss-120b:free',
     },
     'nvidia': {
         'id': 'nvidia',
-        'name': 'Nvidia (Nemotron)',
+        'name': '🟢 Nvidia (Nemotron)',
         'provider': 'openrouter',
         'model_name': 'nvidia/nemotron-3-super-120b-a12b:free',
     },
     'meta': {
         'id': 'meta',
-        'name': 'Llama 3 (Meta)',
+        'name': '🦙 Llama 3 (Meta)',
         'provider': 'groq',
         'model_name': 'llama3-8b-8192',
     },
     'glm': {
         'id': 'glm',
-        'name': 'GLM 4.5 (Z-AI)',
+        'name': '🌐 GLM 4.5 (Z-AI)',
         'provider': 'openrouter',
         'model_name': 'z-ai/glm-4.5-air:free',
     }
