@@ -138,7 +138,7 @@ AI_PROVIDERS = {
     },
     'gemini': {
         'api_key': env('GEMINI_API_KEY', default=''),
-        'default_model': 'gemini-1.5-pro',
+        'default_model': 'gemini-2.0-flash',
         'timeout': 30,
         'max_retries': 3,
     },
@@ -156,7 +156,7 @@ AI_PROVIDERS = {
     },
     'openrouter': {
         'api_key': env('OPENROUTER_API_KEY', default=''),
-        'default_model': 'openai/gpt-4o',
+        'default_model': 'openai/gpt-oss-120b:free',
         'timeout': 30,
         'max_retries': 3,
     },

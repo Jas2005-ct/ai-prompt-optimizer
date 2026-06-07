@@ -37,11 +37,11 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-500 mb-1.5">AI Provider</label>
+                        <label class="block text-xs text-gray-500 mb-1.5">AI Model</label>
                         <select x-model="provider"
                             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
-                            {% for p in providers %}
-                            <option value="{{ p }}">{{ p|capfirst }}</option>
+                            {% for m in models %}
+                            <option value="{{ m.id }}">{{ m.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -146,7 +146,7 @@ function optimizerApp() {
     return {
         rawPrompt: '',
         promptType: 'general',
-        provider: '{{ default_provider }}',
+        provider: '{{ default_model }}',
         loading: false,
         result: null,
         error: '',

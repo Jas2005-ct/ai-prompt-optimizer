@@ -18,6 +18,40 @@ PROVIDER_MAP = {
     'openrouter': OpenRouterAI,
 }
 
+MODEL_REGISTRY = {
+    'gemini': {
+        'id': 'gemini',
+        'name': 'Gemini (Google)',
+        'provider': 'gemini',
+        'model_name': 'gemini-2.0-flash',
+    },
+    'openai': {
+        'id': 'openai',
+        'name': 'OpenAI (GPT-OSS)',
+        'provider': 'openrouter',
+        'model_name': 'openai/gpt-oss-120b:free',
+    },
+    'nvidia': {
+        'id': 'nvidia',
+        'name': 'Nvidia (Nemotron)',
+        'provider': 'openrouter',
+        'model_name': 'nvidia/nemotron-3-super-120b-a12b:free',
+    },
+    'meta': {
+        'id': 'meta',
+        'name': 'Llama 3 (Meta)',
+        'provider': 'groq',
+        'model_name': 'llama3-8b-8192',
+    },
+    'glm': {
+        'id': 'glm',
+        'name': 'GLM 4.5 (Z-AI)',
+        'provider': 'openrouter',
+        'model_name': 'z-ai/glm-4.5-air:free',
+    }
+}
+
+
 
 class AIProviderFactory:
     """
@@ -53,3 +87,18 @@ class AIProviderFactory:
             for name, cfg in settings.AI_PROVIDERS.items()
             if cfg.get('api_key')
         ]
+
+    @staticmethod
+    def list_available_models() -> list[dict]:
+        """Return list of models whose provider has a configured API key."""
+        available = []
+        for model_id, info in MODEL_REGISTRY.items():
+            provider_name = info['provider']
+            cfg = settings.AI_PROVIDERS.get(provider_name)
+            if cfg and cfg.get('api_key'):
+                available.append({
+                    'id': model_id,
+                    'name': info['name'],
+                })
+        return available
+

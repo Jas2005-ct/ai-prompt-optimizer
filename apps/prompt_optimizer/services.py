@@ -61,9 +61,20 @@ class PromptOptimizationService:
     """
 
     def __init__(self, provider_name: str = None, model: str = None):
-        self.provider_name = provider_name or settings.DEFAULT_AI_PROVIDER
-        self.model = model
+        # Resolve user-friendly model category (e.g. 'gemini', 'openai', 'nvidia') to correct provider/model
+        from apps.ai_providers.factory import MODEL_REGISTRY
+        provider_name = provider_name or settings.DEFAULT_AI_PROVIDER
+        
+        if provider_name in MODEL_REGISTRY:
+            resolved = MODEL_REGISTRY[provider_name]
+            self.provider_name = resolved['provider']
+            self.model = resolved['model_name']
+        else:
+            self.provider_name = provider_name
+            self.model = model
+
         self.provider = AIProviderFactory.get_provider(self.provider_name, self.model)
+
 
     def optimize(self, raw_prompt: str, prompt_type: str = 'general', session_id: str = '') -> dict:
         """

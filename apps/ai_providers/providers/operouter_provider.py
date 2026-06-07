@@ -7,8 +7,12 @@ class OpenRouterAI(BaseAIProvider):
 
     @property
     def provider_name(self) -> str:
-        return 'operouter'
+        return 'openrouter'
     
+    @property
+    def model_name(self) -> list[str]:
+        models = ['nvidia/nemotron-3-super-120b-a12b:free','z-ai/glm-4.5-air:free','openai/gpt-oss-120b:free']
+        return models
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def complete(self, system_prompt: str, user_prompt: str, **kwargs) -> AIResponse:
@@ -40,9 +44,9 @@ class OpenRouterAI(BaseAIProvider):
                 content=response_json['choices'][0]['message']['content'],
                 provider=self.provider_name,
                 model=self.model,
-                prompt_tokens=response_json['usage']['prompt_tokens'],
-                completion_tokens=response_json['usage']['completion_tokens'],
-                total_tokens=response_json['usage']['total_tokens'],
+                prompt_tokens=response_json.get('usage', {}).get('prompt_tokens', 0),
+                completion_tokens=response_json.get('usage', {}).get('completion_tokens', 0),
+                total_tokens=response_json.get('usage', {}).get('total_tokens', 0),
             )
         except Exception as e:
             raise AIProviderException('operouter', str(e))

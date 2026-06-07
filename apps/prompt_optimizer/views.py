@@ -22,13 +22,16 @@ class OptimizerPageView(APIView):
     """Main optimizer HTML page."""
 
     def get(self, request):
-        providers = AIProviderFactory.list_available_providers()
+        models = AIProviderFactory.list_available_models()
+        # Find default model: if 'openai' is available, use it, otherwise the first available
+        default_model = 'openai' if any(m['id'] == 'openai' for m in models) else (models[0]['id'] if models else '')
         context = {
-            'providers': providers,
+            'models': models,
             'prompt_types': OptimizationRecord.prompt_type.field.choices if hasattr(OptimizationRecord, 'prompt_type') else [],
-            'default_provider': settings.DEFAULT_AI_PROVIDER,
+            'default_model': default_model,
         }
         return render(request, 'prompt_optimizer/optimizer.html', context)
+
 
 
 class OptimizePromptAPIView(APIView):
