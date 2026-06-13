@@ -38,7 +38,7 @@ class OpenRouterAI(BaseAIProvider):
             response_json = response.json()
 
             if response.status_code != 200:
-                raise AIProviderException('operouter', response_json.get('error', {}).get('message', 'Unknown error'))
+                raise AIProviderException('openrouter', response_json.get('error', {}).get('message', 'Unknown error'))
 
             return AIResponse(
                 content=response_json['choices'][0]['message']['content'],
@@ -49,4 +49,4 @@ class OpenRouterAI(BaseAIProvider):
                 total_tokens=response_json.get('usage', {}).get('total_tokens', 0),
             )
         except Exception as e:
-            raise AIProviderException('operouter', str(e))
+            raise AIProviderException('openrouter', str(e))

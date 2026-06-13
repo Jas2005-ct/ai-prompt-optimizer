@@ -74,7 +74,15 @@ class OptimizationHistoryAPIView(APIView):
 
 
 class SavePromptAPIView(APIView):
-    """API: Save an optimized prompt."""
+    """API: Save and retrieve optimized prompts."""
+
+    def get(self, request):
+        prompt_id = request.query_params.get('id')
+        if prompt_id:
+            prompt = get_object_or_404(SavedPrompt, id=prompt_id)
+            return Response(build_api_response(True, data=SavedPromptSerializer(prompt).data))
+        prompts = SavedPrompt.objects.all()
+        return Response(build_api_response(True, data=SavedPromptSerializer(prompts, many=True).data))
 
     def post(self, request):
         serializer = SavePromptInputSerializer(data=request.data)
@@ -104,3 +112,23 @@ class HistoryPageView(APIView):
     def get(self, request):
         records = OptimizationRecord.objects.all()[:100]
         return render(request, 'prompt_optimizer/history.html', {'records': records})
+
+
+class SavedPageView(APIView):
+    """HTML: Saved prompts page."""
+
+    def get(self, request):
+        saved_prompts = SavedPrompt.objects.all()
+        return render(request, 'prompt_optimizer/saved.html', {'saved_prompts': saved_prompts})
+
+
+class DeleteSavedPromptAPIView(APIView):
+    """API: Delete a saved prompt."""
+
+    def delete(self, request, pk):
+        prompt = get_object_or_404(SavedPrompt, id=pk)
+        if prompt.optimization_record:
+            prompt.optimization_record.is_saved = False
+            prompt.optimization_record.save(update_fields=['is_saved'])
+        prompt.delete()
+        return Response(build_api_response(True, message='Saved prompt deleted successfully.'))

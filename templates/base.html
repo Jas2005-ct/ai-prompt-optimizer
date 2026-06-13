@@ -99,6 +99,10 @@
                 <i data-lucide="wand-2" class="w-4 h-4 flex-shrink-0"></i>
                 <span x-show="sidebarOpen">Optimizer</span>
             </a>
+            <a href="{% url 'saved' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-sm {% if request.resolver_match.url_name == 'saved' %}bg-gray-800 text-white{% endif %}">
+                <i data-lucide="bookmark" class="w-4 h-4 flex-shrink-0"></i>
+                <span x-show="sidebarOpen">Saved Prompts</span>
+            </a>
             <a href="{% url 'history' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-sm {% if request.resolver_match.url_name == 'history' %}bg-gray-800 text-white{% endif %}">
                 <i data-lucide="history" class="w-4 h-4 flex-shrink-0"></i>
                 <span x-show="sidebarOpen">History</span>

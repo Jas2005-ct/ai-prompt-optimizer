@@ -6,7 +6,8 @@ from apps.ai_providers.providers import (
     AnthropicProvider, 
     GeminiProvider, 
     GroqProvider, 
-    OpenRouterAI
+    OpenRouterAI,
+    DeepSeekProvider
 )
 
 
@@ -16,6 +17,7 @@ PROVIDER_MAP = {
     'gemini': GeminiProvider,
     'groq': GroqProvider,
     'openrouter': OpenRouterAI,
+    'deepseek': DeepSeekProvider,
 }
 
 MODEL_REGISTRY = {
@@ -48,6 +50,12 @@ MODEL_REGISTRY = {
         'name': '🌐 GLM 4.5 (Z-AI)',
         'provider': 'openrouter',
         'model_name': 'z-ai/glm-4.5-air:free',
+    },
+    'deepseek': {
+        'id': 'deepseek',
+        'name': '🇨🇳 DeepSeek Chat (DeepSeek)',
+        'provider': 'deepseek',
+        'model_name': 'deepseek-chat',
     }
 }
 

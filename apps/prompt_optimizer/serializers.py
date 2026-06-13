@@ -36,10 +36,15 @@ class OptimizationRecordSerializer(serializers.ModelSerializer):
 
 class SavedPromptSerializer(serializers.ModelSerializer):
     """Serializer for saved prompts."""
+    raw_prompt = serializers.SerializerMethodField()
+
     class Meta:
         model = SavedPrompt
-        fields = ['id', 'title', 'prompt_type', 'optimized_prompt', 'suggested_role', 'tags', 'created_at']
+        fields = ['id', 'title', 'prompt_type', 'optimized_prompt', 'suggested_role', 'tags', 'created_at', 'raw_prompt']
         read_only_fields = ['id', 'created_at']
+
+    def get_raw_prompt(self, obj):
+        return obj.optimization_record.raw_prompt if obj.optimization_record else ''
 
 
 class SavePromptInputSerializer(serializers.Serializer):

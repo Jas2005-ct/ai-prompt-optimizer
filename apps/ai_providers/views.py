@@ -10,3 +10,25 @@ class ListProvidersView(APIView):
     def get(self, request):
         providers = AIProviderFactory.list_available_providers()
         return Response(build_api_response(True, data=providers))
+
+
+class SwitchModelAPIView(APIView):
+    """API: Switch default AI model in session."""
+
+    def post(self, request):
+        provider = request.data.get('provider')
+        model = request.data.get('model')
+        if not provider:
+            return Response(
+                build_api_response(False, message='Provider name is required'),
+                status=400
+            )
+        request.session['default_provider'] = provider
+        if model:
+            request.session['default_model'] = model
+        return Response(
+            build_api_response(
+                True, 
+                message=f'Default model switched to {provider} successfully.'
+            )
+        )

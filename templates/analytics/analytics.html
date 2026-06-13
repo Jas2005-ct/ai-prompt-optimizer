@@ -24,6 +24,14 @@
     </div>
 </div>
 
+<!-- Chart Card -->
+<div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-8">
+    <h3 class="text-sm font-semibold text-white mb-4">Last 7 Days Usage</h3>
+    <div class="h-64 relative w-full">
+        <canvas id="usageChart"></canvas>
+    </div>
+</div>
+
 <!-- By Type + By Provider -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
@@ -53,4 +61,63 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const labels = [{% for item in chart_data %}'{{ item.date }}',{% endfor %}];
+        const counts = [{% for item in chart_data %}{{ item.count }},{% endfor %}];
+
+        const ctx = document.getElementById('usageChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Optimizations',
+                    data: counts,
+                    borderColor: '#a855f7',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                        },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)',
+                        },
+                        ticks: {
+                            color: '#9ca3af',
+                            font: { size: 10 },
+                            stepSize: 1,
+                            precision: 0
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

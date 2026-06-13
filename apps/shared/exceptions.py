@@ -11,7 +11,7 @@ def custom_exception_handler(exc, context):
         response.data = {
             'success': False,
             'error': response.data,
-            'st atus_code': response.status_code,
+            'status_code': response.status_code,
         }
     return response
 
