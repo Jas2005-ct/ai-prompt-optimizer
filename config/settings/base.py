@@ -122,48 +122,54 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'apps.shared.exceptions.custom_exception_handler',
 }
 
+# ---------------------------------------------------------------------------
 # AI Providers Configuration
+# Active providers: gemini, groq, openrouter
+# Future providers (files kept, activate by uncommenting): openai, anthropic
+# ---------------------------------------------------------------------------
 AI_PROVIDERS = {
-    'openai': {
-        'api_key': env('OPENAI_API_KEY', default=''),
-        'default_model': 'gpt-4o',
-        'timeout': 30,
-        'max_retries': 3,
-    },
-    'anthropic': {
-        'api_key': env('ANTHROPIC_API_KEY', default=''),
-        'default_model': 'claude-3-5-sonnet-20241022',
-        'timeout': 30,
-        'max_retries': 3,
-    },
+    # --- Active Providers ---
     'gemini': {
         'api_key': env('GEMINI_API_KEY', default=''),
-        'default_model': 'gemini-1.5-pro',
+        'default_model': 'gemini-2.0-flash',
         'timeout': 30,
         'max_retries': 3,
     },
     'groq': {
         'api_key': env('GROQ_API_KEY', default=''),
-        'default_model': 'llama3-8b-8192',
+        'default_model': 'llama-3.1-8b-instant',
         'timeout': 20,
-        'max_retries': 3,
-    },
-    'deepseek': {
-        'api_key': env('DEEPSEEK_API_KEY', default=''),
-        'default_model': 'deepseek-chat',
-        'timeout': 30,
         'max_retries': 3,
     },
     'openrouter': {
         'api_key': env('OPENROUTER_API_KEY', default=''),
-        'default_model': 'openai/gpt-4o',
+        'default_model': 'nvidia/nemotron-3-ultra-550b-a55b:free',
         'timeout': 30,
         'max_retries': 3,
     },
+    # --- Future Providers (uncomment to activate) ---
+    # 'openai': {
+    #     'api_key': env('OPENAI_API_KEY', default=''),
+    #     'default_model': 'gpt-4o',
+    #     'timeout': 30,
+    #     'max_retries': 3,
+    # },
+    # 'anthropic': {
+    #     'api_key': env('ANTHROPIC_API_KEY', default=''),
+    #     'default_model': 'claude-3-5-sonnet-20241022',
+    #     'timeout': 30,
+    #     'max_retries': 3,
+    # },
+    # 'deepseek': {
+    #     'api_key': env('DEEPSEEK_API_KEY', default=''),
+    #     'default_model': 'deepseek-chat',
+    #     'timeout': 30,
+    #     'max_retries': 3,
+    # },
 }
 
-DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='openai')
-DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='gpt-4o')
+DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='gemini')
+DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='gemini-2.0-flash')
 
 # Cache
 CACHES = {

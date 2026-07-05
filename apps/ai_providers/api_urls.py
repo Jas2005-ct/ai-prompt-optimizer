@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
+from apps.ai_providers.views import ListProvidersView, ListProviderModelsView
 
 urlpatterns = [
-    path('list/', views.ListProvidersView.as_view(), name='api-list-providers'),
+    path('providers/', ListProvidersView.as_view(), name='list-providers'),
+    path('providers/models/', ListProviderModelsView.as_view(), name='list-provider-models'),
 ]
