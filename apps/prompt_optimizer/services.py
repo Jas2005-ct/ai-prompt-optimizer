@@ -10,47 +10,83 @@ from apps.shared.utils import generate_cache_key
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_PROMPT_TEMPLATE = """
-You are an expert AI Prompt Engineer specializing in optimizing prompts for large language models.
-Your task is to transform raw, unstructured user prompts into professional, production-ready AI prompts.
-
-For the given raw prompt, you MUST return a valid JSON object with the following structure:
-{{
-    "optimized_prompt": "The fully rewritten, optimized prompt",
-    "suggested_role": "A role assignment for the AI, e.g. 'You are a senior backend engineer...'",
-    "improvements_made": [
-        "Improved clarity: ...",
-        "Added context: ...",
-        "Fixed grammar: ...",
-        "Structured output: ..."
-    ],
-    "output_structure": "Recommended output format, e.g. Step-by-step, JSON, Table, etc."
-}}
+SYSTEM_PROMPT_TEMPLATE = """You are an expert AI Prompt Engineer specializing in optimizing prompts for large language models.
+Your task is to transform a raw, unstructured user prompt into a high-quality, professional, production-ready AI prompt optimized specifically for the target task type.
 
 Prompt Type: {prompt_type}
 
-Optimization Guidelines:
-- Add clear role assignment
-- Fix grammar and clarity
-- Add output format instructions
-- Add context constraints
-- Specify expected output length/depth
-- Include professional AI instructions
-- Make the prompt specific and actionable
-- Return ONLY valid JSON, no extra text
+Specific Guidelines for this prompt type:
+{type_guidance}
+
+Optimization Objectives:
+1. Role/Persona: Assign a highly specific and professional persona for the AI (e.g. "You are a senior backend engineer...").
+2. Context & Objectives: Outline clear, precise requirements and expectations.
+3. Specific Instructions: Break down tasks into structured, actionable guidelines.
+4. Output Format: Explicitly instruct how the output should be structured (e.g. step-by-step list, code blocks, table, JSON).
+5. Grammar & Clarity: Fix any spelling, grammar, and syntax issues to make the prompt clear.
+6. Make it Actionable: Avoid vague words like "better", "fast", or "high-quality"; instead, define concrete standards.
+
+For the given raw prompt, you MUST return a valid JSON object matching the following structure:
+{{
+    "optimized_prompt": "The fully rewritten, optimized prompt, formatted with Markdown headers and bullet points for maximum readability",
+    "suggested_role": "A clear role/persona assignment for the AI, starting with 'You are a...'",
+    "improvements_made": [
+        "Specifically what was improved (e.g. 'Added clear database schema requirements')",
+        "Include at least 3 distinct improvements"
+    ],
+    "output_structure": "Recommended response format, e.g. 'Annotated Python code block', 'Step-by-step numbered list', 'Markdown table'"
+}}
+
+Return ONLY the raw JSON object. Do not include markdown code block formatting (such as ```json) or any other conversational text in your response.
 """
 
 
 PROMPT_TYPE_GUIDELINES = {
-    'general': 'General AI assistant task. Optimize for clarity and completeness.',
-    'coding': 'Software development task. Add language, framework, best practices, error handling requirements.',
-    'sql': 'Database/SQL task. Include schema context hints, performance, and output format.',
-    'uiux': 'UI/UX design task. Include design system, accessibility, and component structure.',
-    'image': 'Image generation task. Add style, lighting, composition, artistic direction.',
-    'api': 'API design/generation. Include REST standards, versioning, authentication, response format.',
-    'devops': 'DevOps/infrastructure task. Include environment, tools, security, scalability.',
-    'documentation': 'Documentation task. Include audience, format, depth, structure.',
-    'architecture': 'System architecture task. Include scale, technology choices, trade-offs.',
+    'general': (
+        "- Clarify the primary goal and eliminate ambiguous language.\n"
+        "- Add target audience, desired tone, and format guidelines.\n"
+        "- Structure the prompt with clear headings (e.g., Context, Instructions, Output Format)."
+    ),
+    'coding': (
+        "- Identify the programming language, framework, and standards.\n"
+        "- Enforce best practices, clean code conventions, and robust error handling/edge cases.\n"
+        "- Request explanations of complex logic, comments, and structure."
+    ),
+    'sql': (
+        "- Emphasize specifying the SQL dialect (e.g., PostgreSQL, MySQL, SQLite).\n"
+        "- Request database schema context (tables, columns, types) and relationships.\n"
+        "- Incorporate performance optimization constraints (indexing, query plans) and security warnings against SQL injection."
+    ),
+    'uiux': (
+        "- Define target personas, user journeys, and interfaces.\n"
+        "- Include design system constraints, responsiveness requirements, and accessibility (WCAG) standards.\n"
+        "- Outline component structure, user flows, and wireframe specifications."
+    ),
+    'image': (
+        "- Add rich visual details: subject, environment, lighting (cinematic, soft), composition (rule of thirds), and artistic style.\n"
+        "- Include technical parameters (aspect ratio, resolution, camera settings).\n"
+        "- Add negative prompt constraints to avoid text, warp, or low quality."
+    ),
+    'api': (
+        "- Specify the API style (REST, GraphQL, gRPC) and status/error response standards.\n"
+        "- Include request/response schema specifications (JSON), versioning, and authorization headers.\n"
+        "- Request complete payload definitions or mock datasets."
+    ),
+    'devops': (
+        "- Detail the cloud environment/provider (AWS, GCP, Azure) and infrastructure/container tools (Docker, Kubernetes, Terraform).\n"
+        "- Enforce security policies (secrets management, IAM) and scalability requirements.\n"
+        "- Include backup, logging, and monitoring requirements."
+    ),
+    'documentation': (
+        "- Define the style guide or tone of voice (e.g. technical, friendly) and the target audience.\n"
+        "- Specify document structure, table of contents, callouts, and technical depth.\n"
+        "- Request definitions for jargon and structured headings."
+    ),
+    'architecture': (
+        "- Detail architectural patterns (microservices, monolithic, serverless) and scalability limits.\n"
+        "- Request database selections, technical trade-offs (CAP theorem, performance/cost), and data flow descriptions.\n"
+        "- Specify security boundaries and high availability/disaster recovery strategies."
+    ),
 }
 
 
@@ -93,8 +129,9 @@ class PromptOptimizationService:
             return cached
 
         system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-            prompt_type=prompt_type
-        ) + f"\nSpecific type guidance: {PROMPT_TYPE_GUIDELINES.get(prompt_type, '')}"
+            prompt_type=prompt_type,
+            type_guidance=PROMPT_TYPE_GUIDELINES.get(prompt_type, '')
+        )
 
         user_prompt = f"Raw prompt to optimize:\n\n{raw_prompt}"
 

@@ -81,7 +81,8 @@ class SavePromptAPIView(APIView):
         if prompt_id:
             prompt = get_object_or_404(SavedPrompt, id=prompt_id)
             return Response(build_api_response(True, data=SavedPromptSerializer(prompt).data))
-        prompts = SavedPrompt.objects.all()
+        # Use select_related to prefetch related records and avoid N+1 query overhead in serialization
+        prompts = SavedPrompt.objects.select_related('optimization_record').all()
         return Response(build_api_response(True, data=SavedPromptSerializer(prompts, many=True).data))
 
     def post(self, request):

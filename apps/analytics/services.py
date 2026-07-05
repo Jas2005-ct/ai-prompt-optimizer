@@ -39,10 +39,30 @@ class AnalyticsService:
     @staticmethod
     def get_last_7_days() -> list:
         from apps.prompt_optimizer.models import OptimizationRecord
-        result = []
+        from django.db.models.functions import TruncDate
+        
         today = timezone.now().date()
+        seven_days_ago = today - timedelta(days=6)
+        
+        # Fetch counts grouped by date in a single query
+        db_counts = (
+            OptimizationRecord.objects.filter(created_at__date__gte=seven_days_ago)
+            .annotate(date=TruncDate('created_at'))
+            .values('date')
+            .annotate(count=Count('id'))
+            .order_by('date')
+        )
+        
+        # Map database results for lookup
+        counts_map = {str(item['date']): item['count'] for item in db_counts}
+        
+        # Ensure all 7 days are represented, even those with 0 counts
+        result = []
         for i in range(6, -1, -1):
             day = today - timedelta(days=i)
-            count = OptimizationRecord.objects.filter(created_at__date=day).count()
-            result.append({'date': str(day), 'count': count})
+            day_str = str(day)
+            result.append({
+                'date': day_str,
+                'count': counts_map.get(day_str, 0)
+            })
         return result
