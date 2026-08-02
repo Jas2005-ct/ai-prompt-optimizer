@@ -2,9 +2,7 @@
 from django.conf import settings
 from apps.ai_providers.base import BaseAIProvider
 from apps.ai_providers.providers import (
-    GeminiProvider, GroqProvider, OpenRouterProvider,
-    # Future providers (keep files, activate by adding here):
-    # OpenAIProvider, AnthropicProvider,
+    OpenCodeZenProvider, OpenRouterProvider,
 )
 
 
@@ -12,11 +10,17 @@ from apps.ai_providers.providers import (
 # Active provider map — only providers currently supported
 # ---------------------------------------------------------------------------
 PROVIDER_MAP = {
-    'gemini': GeminiProvider,
-    'groq': GroqProvider,
     'openrouter': OpenRouterProvider,
-    # 'openai': OpenAIProvider,       # future
-    # 'anthropic': AnthropicProvider,  # future
+    'opencode_zen': OpenCodeZenProvider,
+}
+
+
+# ---------------------------------------------------------------------------
+# Friendly display labels per provider (used in UI dropdowns / dashboard)
+# ---------------------------------------------------------------------------
+PROVIDER_LABELS = {
+    'openrouter': 'OpenRouter',
+    'opencode_zen': 'OpenCode Zen',
 }
 
 
@@ -24,19 +28,19 @@ PROVIDER_MAP = {
 # Available models per provider (used for UI dropdowns / API listing)
 # ---------------------------------------------------------------------------
 PROVIDER_MODELS = {
-    'gemini': [
-        {'id': 'gemini-2.0-flash', 'label': 'Gemini 2.0 Flash', 'default': True},
-        {'id': 'gemini-2.0-flash-lite', 'label': 'Gemini 2.0 Flash Lite'},
-        {'id': 'gemini-1.5-pro', 'label': 'Gemini 1.5 Pro'},
-        {'id': 'gemini-1.5-flash', 'label': 'Gemini 1.5 Flash'},
-    ],
-    'groq': [
-        {'id': 'llama-3.1-8b-instant', 'label': 'LLaMA 3.1 8B Instant', 'default': True},
-        {'id': 'compound-beta', 'label': 'Groq Compound Beta'},
-    ],
     'openrouter': [
         {'id': 'nvidia/nemotron-3-ultra-550b-a55b:free', 'label': 'NVIDIA Nemotron Ultra 550B (Free)', 'default': True},
-        {'id': 'qwen/qwen3-next-80b-a3b-instruct:free', 'label': 'Qwen3 Next 80B Instruct (Free)'},
+        {'id': 'inclusionai/ling-3.0-flash:free', 'label': 'Ling 3.0 Flash (Free)'},
+        {'id': 'poolside/laguna-s-2.1:free', 'label': 'Laguna S 2.1 (Free)'},
+        {'id': 'openai/gpt-oss-20b:free', 'label': 'GPT OSS 20B (Free)'},
+    ],
+    'opencode_zen': [
+        {'id': 'gpt-5.4-mini', 'label': 'GPT 5.4 Mini', 'default': True},
+        {'id': 'deepseek-v4-flash', 'label': 'DeepSeek V4 Flash'},
+        {'id': 'deepseek-v4-flash-free', 'label': 'DeepSeek V4 Flash (Free)'},
+        {'id': 'glm-5.1', 'label': 'GLM 5.1'},
+        {'id': 'kimi-k2.5', 'label': 'Kimi K2.5'},
+        {'id': 'big-pickle', 'label': 'Big Pickle (Free)'},
     ],
 }
 
@@ -44,14 +48,24 @@ PROVIDER_MODELS = {
 class AIProviderFactory:
     """
     Factory class to instantiate AI providers dynamically.
-    Usage: provider = AIProviderFactory.get_provider('gemini')
-           provider = AIProviderFactory.get_provider('groq', model='llama-3.1-8b-instant')
+    Usage: provider = AIProviderFactory.get_provider_for_model('nvidia/nemotron-3-ultra-550b-a55b:free')
+           provider = AIProviderFactory.get_provider('openrouter', model='openai/gpt-oss-20b:free')
     """
 
     @staticmethod
+    def get_provider_for_model(model: str = None) -> str:
+        """Return the provider key that owns the given model id."""
+        if not model:
+            return settings.DEFAULT_AI_PROVIDER
+        for provider_name, models in PROVIDER_MODELS.items():
+            if any(m['id'] == model for m in models):
+                return provider_name
+        raise ValueError(f"Model '{model}' is not available for any configured provider.")
+
+    @staticmethod
     def get_provider(provider_name: str = None, model: str = None) -> BaseAIProvider:
-        """Return an instantiated provider based on name."""
-        provider_name = provider_name or settings.DEFAULT_AI_PROVIDER
+        """Return an instantiated provider based on name (derived from model if omitted)."""
+        provider_name = provider_name or AIProviderFactory.get_provider_for_model(model)
         config = settings.AI_PROVIDERS.get(provider_name)
 
         if not config:
@@ -85,6 +99,29 @@ class AIProviderFactory:
             for name, cfg in settings.AI_PROVIDERS.items()
             if cfg.get('api_key') and name in PROVIDER_MAP
         ]
+
+    @staticmethod
+    def list_available_providers_with_labels() -> list:
+        """Return list of dicts {id, label} for configured providers."""
+        return [
+            {'id': name, 'label': PROVIDER_LABELS.get(name, name)}
+            for name in AIProviderFactory.list_available_providers()
+        ]
+
+    @staticmethod
+    def list_available_models() -> list:
+        """Return flat list of dicts {id, label, provider, provider_label} for configured providers."""
+        models = []
+        for provider_name in AIProviderFactory.list_available_providers():
+            for m in PROVIDER_MODELS.get(provider_name, []):
+                models.append({
+                    'id': m['id'],
+                    'label': m['label'],
+                    'provider': provider_name,
+                    'provider_label': PROVIDER_LABELS.get(provider_name, provider_name),
+                    'default': m.get('default', False),
+                })
+        return models
 
     @staticmethod
     def list_models_for_provider(provider_name: str) -> list:

@@ -22,11 +22,11 @@ class OptimizerPageView(APIView):
     """Main optimizer HTML page."""
 
     def get(self, request):
-        providers = AIProviderFactory.list_available_providers()
+        model_options = AIProviderFactory.list_available_models()
         context = {
-            'providers': providers,
+            'model_options': model_options,
             'prompt_types': OptimizationRecord.prompt_type.field.choices if hasattr(OptimizationRecord, 'prompt_type') else [],
-            'default_provider': settings.DEFAULT_AI_PROVIDER,
+            'default_model': settings.DEFAULT_AI_MODEL,
         }
         return render(request, 'prompt_optimizer/optimizer.html', context)
 

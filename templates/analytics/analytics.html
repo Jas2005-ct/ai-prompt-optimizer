@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load ai_provider_filters %}
 {% block title %}Analytics — AI Prompt Optimizer{% endblock %}
 {% block page_title %}Analytics{% endblock %}
 {% block page_subtitle %}Usage and optimization statistics{% endblock %}
@@ -44,7 +45,7 @@
         <div class="space-y-3">
             {% for item in stats.by_provider %}
             <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-400">{{ item.ai_provider|capfirst }}</span>
+                <span class="text-sm text-gray-400">{{ item.ai_provider|provider_label }}</span>
                 <span class="text-sm font-semibold text-white">{{ item.count }}</span>
             </div>
             {% empty %}

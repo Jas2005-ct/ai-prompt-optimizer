@@ -23,7 +23,7 @@ class OptimizationRecord(BaseModel):
         choices=PromptType.choices,
         default=PromptType.GENERAL,
     )
-    ai_provider = models.CharField(max_length=50, default='openai')
+    ai_provider = models.CharField(max_length=50, default='openrouter')
     ai_model = models.CharField(max_length=100, blank=True)
 
     # Results

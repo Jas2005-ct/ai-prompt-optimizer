@@ -12,9 +12,6 @@ dj-database-url>=2.1
 
 # AI Providers
 openai>=1.30
-anthropicai>=0.26
-google-generativeai>=0.7
-groq>=0.9
 httpx>=0.27
 
 # Async & Caching

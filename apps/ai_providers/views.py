@@ -18,7 +18,7 @@ class ListProviderModelsView(APIView):
     List models for a specific provider or all providers.
 
     GET /api/providers/models/          -> all providers with models
-    GET /api/providers/models/?provider=groq  -> models for groq only
+    GET /api/providers/models/?provider=openrouter  -> models for openrouter only
     """
 
     def get(self, request):

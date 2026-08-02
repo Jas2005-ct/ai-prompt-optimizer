@@ -11,7 +11,7 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# Supabase PostgreSQL
+# PostgreSQL (via DATABASE_URL, e.g. Render-managed Postgres)
 DATABASES = {
     'default': dj_database_url.config(
         default=env('DATABASE_URL'),

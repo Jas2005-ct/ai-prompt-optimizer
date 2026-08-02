@@ -17,7 +17,7 @@ class OptimizePromptInputSerializer(serializers.Serializer):
         choices=['general', 'coding', 'sql', 'uiux', 'image', 'api', 'devops', 'documentation', 'architecture'],
         default='general',
     )
-    provider = serializers.CharField(max_length=50, default='openai')
+    provider = serializers.CharField(max_length=50, required=False, allow_blank=True)
     model = serializers.CharField(max_length=100, required=False, allow_blank=True)
     session_id = serializers.CharField(max_length=100, required=False, allow_blank=True)
 

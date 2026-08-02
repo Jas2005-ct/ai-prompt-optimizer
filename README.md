@@ -8,7 +8,7 @@ A modern, production-ready Django Full Stack application that transforms raw/uns
 
 - 🧠 **Prompt Optimization Engine** – Automatically improves clarity, grammar, formatting, role, context
 - 🎯 **Multiple Prompt Types** – General, Coding, SQL, UI/UX, Image Gen, API, DevOps, Documentation, Architecture
-- 🔌 **Multi-LLM Support** – OpenAI, Claude, Gemini, DeepSeek, Groq, OpenRouter
+- 🔌 **Multi-LLM Support** – OpenRouter, OpenCode Zen
 - 📜 **Prompt History** – Track all past optimizations
 - 📋 **Prompt Templates** – Pre-built templates per category
 - 📊 **Analytics Dashboard** – Usage and optimization stats
@@ -48,10 +48,10 @@ core/
 | **Backend** | Django 5.x + DRF | Mature, fast, clean |
 | **Frontend** | Django Templates + HTMX + Alpine.js | Minimal JS, reactive |
 | **CSS** | Tailwind CSS v3 | Modern utility-first |
-| **Database** | SQLite (dev) / Supabase PostgreSQL (prod) | Flexible |
-| **AI** | OpenAI / Claude / Gemini / Groq / DeepSeek | Multi-provider |
-| **Cache** | Django Cache (Redis optional) | Optimized |
-| **Deploy** | Docker + Render/Railway | Easy CI/CD |
+| **Database** | SQLite (dev) / PostgreSQL (prod) | Flexible |
+| **AI** | OpenRouter / OpenCode Zen | Multi-provider |
+| **Cache** | Django Cache (in-memory, Redis ready) | Optimized |
+| **Deploy** | Docker + Render | Easy CI/CD |
 | **Package Mgr** | UV | Fast Python packages |
 
 ---
@@ -115,12 +115,8 @@ docker-compose up --build
 
 ## 🔑 Supported AI Providers
 
-- **OpenAI** (GPT-4o, GPT-4-turbo)
-- **Anthropic Claude** (Claude 3.5 Sonnet)
-- **Google Gemini** (Gemini 1.5 Pro)
-- **Groq** (Llama 3, Mixtral)
-- **DeepSeek** (DeepSeek Chat)
-- **OpenRouter** (100+ models)
+- **OpenRouter** (NVIDIA Nemotron Ultra 550B, Ling 3.0 Flash, Laguna S 2.1, GPT OSS 20B — 100+ models)
+- **OpenCode Zen** (GPT 5.4 Mini, DeepSeek V4 Flash, GLM 5.1, Kimi K2.5, Big Pickle — curated by the OpenCode team)
 
 ---
 

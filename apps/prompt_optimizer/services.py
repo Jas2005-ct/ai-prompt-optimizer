@@ -10,38 +10,28 @@ from apps.shared.utils import generate_cache_key
 logger = logging.getLogger(__name__)
 
 
-SYSTEM_PROMPT_TEMPLATE = """
-You are an expert AI Prompt Engineer specializing in optimizing prompts for large language models.
-Your task is to transform raw, unstructured user prompts into professional, production-ready AI prompts.
+SYSTEM_PROMPT_TEMPLATE = """You are an expert prompt engineer. Rewrite the user's raw prompt into a production-ready LLM prompt.
 
-For the given raw prompt, you MUST return a valid JSON object with the following structure:
-{
-    "optimized_prompt": "The fully rewritten, optimized prompt",
-    "suggested_role": "A role assignment for the AI, e.g. 'You are a senior backend engineer...'",
-    "improvements_made": [
-        "Improved clarity: ...",
-        "Added context: ...",
-        "Fixed grammar: ...",
-        "Structured output: ..."
-    ],
-    "output_structure": "Recommended output format, e.g. Step-by-step, JSON, Table, etc."
-}
+Return ONLY a JSON object (no markdown, no code fences, no extra text) with this exact schema:
+{{
+  "optimized_prompt": "The rewritten prompt: clear role + task + context + constraints + output format",
+  "suggested_role": "One-line role for the AI, e.g. 'You are a senior backend engineer.'",
+  "improvements_made": ["short bullet per change made"],
+  "output_structure": "Recommended format: paragraph | steps | JSON | table | bullets"
+}}
 
-Prompt Type: {prompt_type}
+Rules:
+- Assign a specific role and state the task precisely.
+- Add context, constraints, and the exact output format and length.
+- Fix grammar, remove ambiguity, keep the user's intent; never invent facts.
+- Make every instruction actionable.
 
-Optimization Guidelines:
-- Add clear role assignment
-- Fix grammar and clarity
-- Add output format instructions
-- Add context constraints
-- Specify expected output length/depth
-- Include professional AI instructions
-- Make the prompt specific and actionable
-- Return ONLY valid JSON, no extra text
+Prompt category: {prompt_type}
+Type guidance: {type_guidance}
 """
 
 
-PROMPT_TYPE_GUIDELINES = {
+PROMPT_TYPE_GUIDANCE = {
     'general': 'General AI assistant task. Optimize for clarity and completeness.',
     'coding': 'Software development task. Add language, framework, best practices, error handling requirements.',
     'sql': 'Database/SQL task. Include schema context hints, performance, and output format.',
@@ -61,8 +51,8 @@ class PromptOptimizationService:
     """
 
     def __init__(self, provider_name: str = None, model: str = None):
-        self.provider_name = provider_name or settings.DEFAULT_AI_PROVIDER
         self.model = model
+        self.provider_name = provider_name or AIProviderFactory.get_provider_for_model(model)
         self.provider = AIProviderFactory.get_provider(self.provider_name, self.model)
 
     def optimize(self, raw_prompt: str, prompt_type: str = 'general', session_id: str = '') -> dict:
@@ -74,6 +64,7 @@ class PromptOptimizationService:
             'prompt': raw_prompt,
             'type': prompt_type,
             'provider': self.provider_name,
+            'model': self.model,
         })
 
         cached = cache.get(cache_key)
@@ -82,8 +73,9 @@ class PromptOptimizationService:
             return cached
 
         system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-            prompt_type=prompt_type
-        ) + f"\nSpecific type guidance: {PROMPT_TYPE_GUIDELINES.get(prompt_type, '')}"
+            prompt_type=prompt_type,
+            type_guidance=PROMPT_TYPE_GUIDANCE.get(prompt_type, ''),
+        )
 
         user_prompt = f"Raw prompt to optimize:\n\n{raw_prompt}"
 

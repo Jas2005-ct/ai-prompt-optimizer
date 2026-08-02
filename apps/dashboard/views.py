@@ -8,9 +8,9 @@ def home_view(request):
     """Main dashboard/home page."""
     stats = AnalyticsService.get_overview_stats()
     recent = OptimizationRecord.objects.all()[:5]
-    providers = AIProviderFactory.list_available_providers()
+    model_options = AIProviderFactory.list_available_models()
     return render(request, 'dashboard/home.html', {
         'stats': stats,
         'recent_optimizations': recent,
-        'providers': providers,
+        'model_options': model_options,
     })

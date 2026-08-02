@@ -19,7 +19,7 @@
                     class="w-full h-40 bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 resize-none focus:outline-none focus:border-purple-500 transition-colors mono"
                 ></textarea>
 
-                <!-- Prompt Type + Provider Row -->
+                <!-- Prompt Type + Model Row -->
                 <div class="grid grid-cols-2 gap-3 mt-4">
                     <div>
                         <label class="block text-xs text-gray-500 mb-1.5">Prompt Type</label>
@@ -37,11 +37,11 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-500 mb-1.5">AI Provider</label>
-                        <select x-model="provider"
+                        <label class="block text-xs text-gray-500 mb-1.5">AI Model</label>
+                        <select x-model="model"
                             class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500">
-                            {% for p in providers %}
-                            <option value="{{ p }}">{{ p|capfirst }}</option>
+                            {% for m in model_options %}
+                            <option value="{{ m.id }}">{{ m.label }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -124,7 +124,8 @@
                 <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">📐 Recommended Output Structure</p>
                 <p class="text-sm text-blue-300" x-text="result.output_structure"></p>
                 <div class="mt-3 flex items-center gap-4 text-xs text-gray-600">
-                    <span x-text="'Provider: ' + (result.ai_provider || provider)"></span>
+                    <span x-text="'Model: ' + (result.ai_model || model)"></span>
+                    <span x-text="'Provider: ' + (result.ai_provider || '')"></span>
                     <span x-text="'Tokens: ' + (result.token_count || 0)"></span>
                 </div>
             </div>
@@ -146,7 +147,7 @@ function optimizerApp() {
     return {
         rawPrompt: '',
         promptType: 'general',
-        provider: '{{ default_provider }}',
+        model: '{{ default_model }}',
         loading: false,
         result: null,
         error: '',
@@ -172,7 +173,7 @@ function optimizerApp() {
                     body: JSON.stringify({
                         raw_prompt: this.rawPrompt,
                         prompt_type: this.promptType,
-                        provider: this.provider,
+                        model: this.model,
                         session_id: getSessionId(),
                     }),
                 });

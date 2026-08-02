@@ -12,13 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Environment variables
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ['localhost', '127.0.0.1']),
+    ALLOWED_HOSTS=['localhost', '127.0.0.1'],
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Security
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-change-me-in-production')
-ALLOWED_HOSTS = env('DJANGO_ALLOWED_HOSTS')
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # Application definition
 DJANGO_APPS = [
@@ -124,52 +124,26 @@ REST_FRAMEWORK = {
 
 # ---------------------------------------------------------------------------
 # AI Providers Configuration
-# Active providers: gemini, groq, openrouter
-# Future providers (files kept, activate by uncommenting): openai, anthropic
+# Active providers: openrouter, opencode_zen
 # ---------------------------------------------------------------------------
 AI_PROVIDERS = {
     # --- Active Providers ---
-    'gemini': {
-        'api_key': env('GEMINI_API_KEY', default=''),
-        'default_model': 'gemini-2.0-flash',
-        'timeout': 30,
-        'max_retries': 3,
-    },
-    'groq': {
-        'api_key': env('GROQ_API_KEY', default=''),
-        'default_model': 'llama-3.1-8b-instant',
-        'timeout': 20,
-        'max_retries': 3,
-    },
     'openrouter': {
         'api_key': env('OPENROUTER_API_KEY', default=''),
         'default_model': 'nvidia/nemotron-3-ultra-550b-a55b:free',
         'timeout': 30,
         'max_retries': 3,
     },
-    # --- Future Providers (uncomment to activate) ---
-    # 'openai': {
-    #     'api_key': env('OPENAI_API_KEY', default=''),
-    #     'default_model': 'gpt-4o',
-    #     'timeout': 30,
-    #     'max_retries': 3,
-    # },
-    # 'anthropic': {
-    #     'api_key': env('ANTHROPIC_API_KEY', default=''),
-    #     'default_model': 'claude-3-5-sonnet-20241022',
-    #     'timeout': 30,
-    #     'max_retries': 3,
-    # },
-    # 'deepseek': {
-    #     'api_key': env('DEEPSEEK_API_KEY', default=''),
-    #     'default_model': 'deepseek-chat',
-    #     'timeout': 30,
-    #     'max_retries': 3,
-    # },
+    'opencode_zen': {
+        'api_key': env('OPENCODE_ZEN_API_KEY', default=''),
+        'default_model': 'gpt-5.4-mini',
+        'timeout': 30,
+        'max_retries': 3,
+    },
 }
 
-DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='gemini')
-DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='gemini-2.0-flash')
+DEFAULT_AI_PROVIDER = env('DEFAULT_AI_PROVIDER', default='openrouter')
+DEFAULT_AI_MODEL = env('DEFAULT_AI_MODEL', default='nvidia/nemotron-3-ultra-550b-a55b:free')
 
 # Cache
 CACHES = {
